@@ -2,3 +2,5 @@
 
 /* Readable secondary text, including smaller laptop displays. */
 .profile p{color:#8c8170;font-size:11px}.eyebrow{color:#8e806d}.crumb{color:#8d806d}.under-compose{font-size:9px;color:#958773}.hint,details p{color:#91816a;font-size:11px}#welcome p{color:#978871;font-size:13px}.starters small{font-size:8px;color:#9c886d}.sidebar-bottom p{color:#95856f;font-size:9px}.compose-bottom>span{font-size:9px;color:#a0917d}.chapter small{font-size:9px}.pagefooter{color:#9f8e77}
+
+.news-panel{margin:0 0 12px;padding:12px 16px;border:1px solid #d9cdbb;border-radius:8px;flex-shrink:0}.news-panel summary{cursor:pointer;font-size:13px}.news-panel[open]{max-height:260px;overflow:auto}.news-panel button{padding:8px 12px;border:1px solid #d9cdbb;border-radius:4px}.news-source{padding:12px 0;border-top:1px solid #e0d7c9}.news-source a{color:#8c4e3a;text-decoration:underline}.news-source small{display:block;margin:6px 0}.news-source p{font-size:12px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere}.search-settings{margin-top:32px;padding-top:20px;border-top:1px solid #d9cdbb}

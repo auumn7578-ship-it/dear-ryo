@@ -1,7 +1,7 @@
-import {YUEHU_PERSONA,rolePrompt} from './persona.js?v=complete1';
-import {cleanSchedule,scheduleLabel,mergeCandidates,confirmSchedule,extractCandidates,schedulePrompt,extractionPrompt} from './schedule.js?v=complete1';
-import {NEWS_TTL,searchEndpoint,cleanNews,newsContext} from './news.js?v=complete1';
-import {endpoint,readStream,safeArchive} from './core.js?v=complete1';
+import {YUEHU_PERSONA,rolePrompt} from './persona.js?v=searchfix2';
+import {cleanSchedule,scheduleLabel,mergeCandidates,confirmSchedule,extractCandidates,schedulePrompt,extractionPrompt} from './schedule.js?v=searchfix2';
+import {NEWS_TTL,searchEndpoint,cleanNews,newsContext} from './news.js?v=searchfix2';
+import {endpoint,readStream,safeArchive} from './core.js?v=searchfix2';
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const defaults={nickname:'',relationship:'恋人',language:'中文',persona:'这是以桥本凉为灵感的成年同人角色。直率，有自己的想法和生活，熟悉后会轻轻逗人。表达关心时具体自然，不讲霸总式情话。不总是反问，也不每句都加（笑）。喜欢聊料理、音乐和日常。回复像手机上的短消息，可以有停顿，不写长篇动作描写。',memory:'',biography:'',schedule:[],scheduleLastCheck:'',scheduleAuto:true,base:'',model:'',provider:'custom',stream:true,photo:'',searchUrl:'',searchEnabled:false};
 let cfg={...defaults},sessions=[],current='',busy=false,controller=null,toastTimer,confirmAction=null,failed=false;
@@ -90,7 +90,7 @@ async function syncSchedule(){
  const password=$('#search-password').value.trim();if(!password)throw Error('请填写搜索口令');settings();$('#schedule-status').textContent='正在搜索已公开的工作安排…';
  const ac=new AbortController();controller=ac;const timer=setTimeout(()=>ac.abort('timeout'),25000);let news;
  try{const r=await fetch(searchEndpoint(cfg.searchUrl),{method:'POST',headers:{Authorization:'Bearer '+password,'Content-Type':'application/json'},body:JSON.stringify({mode:'schedule'}),signal:ac.signal});const data=await r.json();if(!r.ok)throw Error(data.error||'搜索失败');if(data.mode!=='schedule')throw Error('请更新 Cloudflare 的 worker.js');news=cleanNews(data)}catch(e){if(ac.signal.reason==='user')throw new DOMException('停止','AbortError');if(ac.signal.aborted)throw Error('日程搜索超时');throw e}finally{clearTimeout(timer);if(controller===ac)controller=null}
- $('#schedule-status').textContent='正在从公告摘要整理日期…';const text=await request(extractionPrompt(news),()=>{},false,true);const incoming=extractCandidates(text,news);const before=cfg.schedule.length;cfg.schedule=mergeCandidates(cfg.schedule,incoming);cfg.scheduleLastCheck=new Date().toISOString();save();renderSchedule();$('#schedule-status').textContent='新增 '+(cfg.schedule.length-before)+' 条待核对日程。原有记录保留；请打开来源核对后确认。找不到完整年月日时不会猜测。';
+ const sourceBox=$('#schedule-search-sources');sourceBox.replaceChildren();for(const r of news.results){const card=node('div','news-source'),a=node('a','',r.title);a.href=r.url;a.target='_blank';a.rel='noopener noreferrer';card.append(a,node('p','',r.content));sourceBox.append(card)}$('#schedule-status').textContent='正在从公告摘要整理日期…';const text=await request(extractionPrompt(news),()=>{},false,true);const incoming=extractCandidates(text,news);const before=cfg.schedule.length;cfg.schedule=mergeCandidates(cfg.schedule,incoming);cfg.scheduleLastCheck=new Date().toISOString();save();renderSchedule();$('#schedule-status').textContent='检索到 '+news.results.length+' 条来源；新增 '+(cfg.schedule.length-before)+' 条待核对日程。'+(incoming.length?'原有记录保留，请打开来源核对后确认。':'未提取到原文明确写出完整年月日的未来安排；旧闻、相对年份和不完整日期已跳过。');
 }
 $('#sync-schedule').onclick=async()=>{if(busy)return;activity(true);try{await syncSchedule()}catch(e){$('#schedule-status').textContent=e.message}finally{activity(false)}};
 renderSchedule();

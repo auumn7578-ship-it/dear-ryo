@@ -1,4 +1,4 @@
-import {cleanSchedule} from './schedule.js?v=complete1';
+import {cleanSchedule} from './schedule.js?v=searchfix2';
 export function endpoint(base){const u=new URL(base.trim());if(u.protocol!=='https:' && !(u.protocol==='http:'&&['localhost','127.0.0.1'].includes(u.hostname)))throw Error('接口请使用 HTTPS 地址（本机 localhost 除外）。');if(u.username||u.password||u.search||u.hash)throw Error('接口地址不能包含账号、查询参数或片段。');u.pathname=u.pathname.replace(/\/+$/,'').replace(/\/chat\/completions$/,'')+'/chat/completions';return u.href;}
 export async function readStream(body,onText){if(!body)throw Error('没有收到流式响应。');const reader=body.getReader(),decoder=new TextDecoder();let buffer='',result='',done=false;
  function block(event){for(const line of event.split('\n')){if(!line.startsWith('data:'))continue;const raw=line.slice(5).trim();if(!raw)continue;if(raw==='[DONE]'){done=true;continue;}let data;try{data=JSON.parse(raw)}catch{throw Error('服务返回了无法识别的流式格式，可以在设置中关闭逐字显示。')}if(data.error)throw Error(data.error.message||'模型服务返回错误');const delta=data.choices?.[0]?.delta;const text=delta?.content||delta?.refusal||'';if(typeof text==='string'&&text){result+=text;onText(result)}}}
